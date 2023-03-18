@@ -32,18 +32,47 @@ return} ;
 const isMatch=await bcrypt.compare(password,user.password);
 if(!isMatch) {res.status(400).json({msg:'mot de passe incorrect'});
 return;}
+
 // if(user.role!=1) throw Error('Accès authorisé sauf pour admin');
 const accessToken = generateAccessToken(user);
+const refreshToken = generateRefreshToken(user);
 res.status(200).json({
 accessToken,
+refreshToken,
 user
 })
 } catch (error) {
 res.status(404).json({ message: error.message });
 }
 });
+
 //Access Token
 const generateAccessToken=(user) =>{
 return jwt.sign({user}, process.env.ACCESS_TOKEN_SECRET, { expiresIn:'120s' });
 }
+//Refresh Token
+function generateRefreshToken(user){
+    return jwt.sign({user}, process.env.REFRESH_TOKEN_SECRET,{expiresIn:'1y'});
+}
+//Refresh Route
+router.post('/refreshToken',async(req,res,)=>{
+    const refreshToken=req.body.refreshToken;
+    if(!refreshToken){return res.status(404).json({ message: 'Token Not Found' });
+}
+else {
+jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user)=> { 
+    if (err) {
+return res.status(406).json({ message: 'Unauthorized' });
+}
+else {
+const accessToken = generateAccessToken(user);
+const refreshToken = generateRefreshToken(user);
+res.status(200).json({
+accessToken,
+refreshToken
+})
+}
+});
+}
+});
 module.exports = router;
