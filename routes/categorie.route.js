@@ -3,10 +3,12 @@ var router = express.Router();
 
 // Créer une instance de categorie.
 const Categorie = require('../models/categorie.js');
-const auth = require("../middelwares/auth.js");
+// const auth = require("../middelwares/auth.js");
 
 // afficher la liste des categories.
-router.get('/', auth, async (req, res,) => {
+//router.get('/', auth, async (req, res,) => {
+router.get('/', async (req, res,) => {
+
     try {
         const cat = await Categorie.find();
         res.status(200).json(cat);
